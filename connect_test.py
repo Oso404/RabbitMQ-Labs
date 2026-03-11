@@ -10,10 +10,10 @@ properties contains any additional properties that were sent with the message (l
 body is the actual message body that was sent by the producer (in this case, it will be 'User Information')
 """
 def pdf_process_function(ch, method, properties, body):
-    print(" PDF processing")
-    print(" [x] Received " + str(body))
+    print("PDF processing")
+    print("Received " + str(body))
     time.sleep(random.randint(1, 10))  # simulate a job 1 to 10 secs.
-    print(" PDF processing finished")
+    print("PDF processing finished")
     ch.basic_ack(delivery_tag=method.delivery_tag)  # manually acknowledge
 
 
@@ -31,9 +31,8 @@ channel.basic_publish(exchange='', routing_key='pdfprocess', body='User Informat
 channel.basic_publish(exchange='', routing_key='pdfprocess', body='User Information 2')
 channel.basic_publish(exchange='', routing_key='pdfprocess', body='User Information 3')
 
-print(" [x] Sent 'User Information'")
-
-# 
+print("Sent user information to the queue.")
+# establishes a connection between the consumer and the queue 
 channel.basic_consume(
     queue='pdfprocess',           # which queue to consume from
     on_message_callback=pdf_process_function, # function to run when a message arrives
@@ -44,6 +43,7 @@ try:
     channel.start_consuming()  # consumer starts consuming messages from the queue
 except KeyboardInterrupt:
     print("\nStopping consumer...")
+    channel.close() #close channel
     connection.close()  #close connection
 
 
